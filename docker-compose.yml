@@ -1,6 +1,6 @@
 fpm:
  dockerfile: ./Dockerfile
- build: ./mysql-5.7.22
+ build: ./php-fpm7.2
  ports:
  - 127.0.0.1:9201:9201
  - 127.0.0.1:25:25
