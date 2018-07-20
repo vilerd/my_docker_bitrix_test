@@ -1,0 +1,25 @@
+fpm:
+ dockerfile: ./Dockerfile
+ build: ./mysql-5.7.22
+ ports:
+ - 127.0.0.1:9201:9201
+ - 127.0.0.1:25:25
+ volumes:
+ - /home/bitrix/:/home/bitrix/
+ - /home/php/logs:/var/log/php/ 
+ links:
+ - mysql
+mysql:
+ dockerfile: ./Dockerfile
+ build: ./mysql-5.7.22
+ volumes:
+ - /home/mysql/:/var/lib/mysql
+ restart: always
+ environment:
+ - MYSQL_ROOT_PASSWORD=jym4Ayl
+ - MYSQL_DATABASE=bitrix
+ - MYSQL_USER=bitrix
+ - MYSQL_PASSWORD=26hBp3YRV9KMnP37
+ ports:
+ - 127.0.0.1:3307:3306
+
