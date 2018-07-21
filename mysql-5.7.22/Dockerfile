@@ -76,14 +76,12 @@ RUN { \
 	&& echo 'thread_cache_size = 20' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
 	&& echo 'max_heap_table_size = 256M' >> /etc/mysql/mysql.conf.d/mysqld.cnf \ 
 	&& echo 'tmp_table_size = 265M' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
-	&& echo 'sort_buffer_size = 2M' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
 	&& echo 'read_rnd_buffer_size = 2M' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
 	&& echo 'table_open_cache = 4096' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
 	&& echo 'innodb_flush_log_at_trx_commit = 2' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
 	&& echo 'innodb_flush_method = O_DIRECT' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
 	&& echo 'transaction-isolation = READ-COMMITTED' >> /etc/mysql/mysql.conf.d/mysqld.cnf \ 
 	&& echo 'key_buffer_size = 64M' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
-	&& echo 'sort_buffer_size = 32M' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
 	&& echo 'sort_buffer_size = 32M' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
 	&& echo 'innodb_file_per_table = 1' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
 	&& echo 'table_open_cache = 4096' >> /etc/mysql/mysql.conf.d/mysqld.cnf \
