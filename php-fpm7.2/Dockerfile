@@ -52,23 +52,24 @@ RUN set -x \
     && rm /usr/local/etc/php-fpm.d/www.conf.default \
     && rm /usr/local/etc/php-fpm.conf.default \
     && rm /usr/local/etc/php-fpm.d/www.conf \
+    && rm /usr/local/etc/php-fpm.d/zz-docker.conf \
     && /bin/mkdir /run/php-fpm \
     && rm -r /etc/postfix \
     && groupadd bitrix -g 1003 \
     && useradd -u 1003 --home /home/bitrix --create-home --shell /bin/bash --no-user-group bitrix \
     && usermod -g bitrix bitrix 
 
-WORKDIR /home/bitrix/public-html
-
-
 COPY ./conf/php.ini /usr/local/etc/php/conf.d/php.ini
 COPY ./conf/php-fpm.conf /usr/local/etc/php-fpm.conf
 COPY ./conf/bitrix.conf /usr/local/etc/php-fpm.d/bitrix.conf
+COPY ./conf/zz-docker.conf /usr/local/etc/php-fpm.d/zz-docker.conf
 COPY ./postfix /etc/postfix
 COPY ./resources/supervisord.conf /etc/supervisor/supervisord.conf
 COPY ./resources/rsyslog.conf /etc/rsyslog.conf
 COPY ./resources/listen.conf /etc/rsyslog.d/listen.conf
 COPY ./conf/aliases /etc/aliases
+
+WORKDIR /home/bitrix/public-html
 
 EXPOSE 9201 25 3306
 

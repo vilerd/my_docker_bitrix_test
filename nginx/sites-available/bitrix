@@ -1,0 +1,123 @@
+#
+ server {
+	listen 80 default;               
+		access_log /var/log/nginx/streamway.access.log;
+                error_log /var/log/nginx/streamway.error.log;
+
+ 		add_header X-Frame-Options SAMEORIGIN;
+                add_header X-Content-Type-Options nosniff;
+
+                proxy_ignore_client_abort on;
+
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+                proxy_set_header Host $host;
+                client_max_body_size 32m;
+                
+		index index.php index.html bitrixsetup.php;
+                
+                root /home/bitrix/public-html;
+
+                error_page 404 /index.php;
+
+                error_page 502 /502.html;
+                location = /502.html {
+                        root  /var/www/nginx-custom-page;
+                }
+
+           location / {
+                   try_files       $uri $uri/ @bitrix;
+           }
+
+           location ~ \.php$ {
+                   try_files            $uri @bitrix;
+                   fastcgi_pass        unix:/run/php-docker/bitrix.sock;
+		 #  fastcgi_pass         127.0.0.1:9201;
+                   fastcgi_param        SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                   include              fastcgi_params_bitrix;
+           }
+
+           location @bitrix {
+#                   fastcgi_pass         127.0.0.1:9201;
+	            fastcgi_pass        unix:/run/php-php-docker/bitrix.sock;
+                   include              fastcgi_params_bitrix;
+                   fastcgi_param        SCRIPT_FILENAME $document_root/bitrix/urlrewrite.php;
+           }
+
+           location @bitrixadm{
+#                   fastcgi_pass         127.0.0.1:9201;
+		   fastcgi_pass        unix:/run/php-php-docker/bitrix.sock;
+                   include              fastcgi_params_bitrix;
+                   fastcgi_param        SCRIPT_FILENAME $document_root/bitrix/admin/404.php;
+           }
+
+           location = /favicon.ico {
+                   log_not_found off;
+                   access_log off;
+           }
+
+           location = /robots.txt {
+                   allow all;
+                   log_not_found off;
+                   access_log off;
+           }
+           location ~* ^.+\.(jpg|jpeg|gif|png|svg|js|css|mp3|ogg|mpe?g|avi|zip|gz|bz2?|rar)$ {
+                   access_log off;
+                   expires max;
+                   error_page 404 = /404.html;
+           }
+
+           location ~ (/\.ht|/bitrix/modules|/upload/support/not_image|/bitrix/php_interface) {
+                deny all;
+           }
+
+           location ~ /.svn/ {
+                deny all;
+           }
+
+           location ~ /\.ht {
+                deny  all;
+           }
+
+           location ^~ /bitrix/sub {
+                        # we don't use callback and droppped it (XSS)
+                        if ( $arg_callback ) {return 400;}
+			push_stream_subscriber                  long-polling;
+                        push_stream_allowed_origins             "*";
+                        set $push_stream_channels_path          $arg_CHANNEL_ID;
+                        push_stream_last_received_message_tag   $arg_tag;
+                        push_stream_longpolling_connection_ttl  40;
+                        push_stream_authorized_channels_only    on;
+                        push_stream_message_template '#!NGINXNMS!#{"id":~id~,"channel":"~channel~","tag":"~tag~","time":"~time~","eventid":"~event-id~","text":~text~}#!NGINXNME!#';
+                }
+        }
+
+server {
+    # nginx-push-stream-module server for push & pull
+
+listen 8893;
+
+location ^~ / { deny all; }
+}
+
+server {
+    listen 8894;
+
+location ^~ / { deny all; }
+}
+
+server {
+    listen 127.0.0.1:8895;
+    listen 192.168.19.170:8895;
+
+location ^~ /bitrix/pub/ {
+    push_stream_publisher admin;
+    push_stream_channels_path $arg_CHANNEL_ID;
+    push_stream_store_messages on;
+    allow 127.0.0.0/8;
+#deny all;
+}
+
+location ^~ / { deny all; }
+}
